@@ -4,8 +4,8 @@ import torch
 from app.endpoints import preprocess_query
 from app.roberta_utils.helper_functions import preprocessing, Roberta_SentimentClassifier, Roberta_tokenizer
 
-test_file_path = r'C:\Users\a.m.ramachandran\PycharmProjects\CodeQuestions\SentimentAnalysis\Corona_NLP_test.csv'
-model_path = r'C:\Users\a.m.ramachandran\PycharmProjects\fastApiProject\app\best_model_state.bin'
+test_file_path = r'...\Corona_NLP_test.csv'
+model_path = r'...app\best_model_state.bin'
 max_length = 120
 
 test_df = pd.read_csv(test_file_path, encoding='latin1')
