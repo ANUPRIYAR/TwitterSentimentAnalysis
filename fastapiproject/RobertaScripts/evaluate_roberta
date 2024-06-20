@@ -1,0 +1,37 @@
+import pandas as pd
+import torch
+
+from app.endpoints import preprocess_query
+from app.roberta_utils.helper_functions import preprocessing, Roberta_SentimentClassifier, Roberta_tokenizer
+
+test_file_path = r'C:\Users\a.m.ramachandran\PycharmProjects\CodeQuestions\SentimentAnalysis\Corona_NLP_test.csv'
+model_path = r'C:\Users\a.m.ramachandran\PycharmProjects\fastApiProject\app\best_model_state.bin'
+max_length = 120
+
+test_df = pd.read_csv(test_file_path, encoding='latin1')
+test_df = preprocessing(test_df)
+print(f"test_df :{test_df}")
+predictions = []
+for query in test_df['OriginalTweet']:
+    print(query)
+    input_ids, attention_mask = preprocess_query(query, Roberta_tokenizer, max_length)
+
+    model = Roberta_SentimentClassifier(n_classes=5)
+    model.load_state_dict(torch.load(model_path))
+    pred = model(input_ids, attention_mask)
+    probabilities = torch.nn.functional.softmax(pred, dim=1)
+    predicted_class = torch.argmax(probabilities, dim=1)
+    print(predicted_class)
+    sentiment_mapping = {
+        'Extremely Negative': 0,
+        'Extremely Positive': 1,
+        'Negative': 2,
+        'Neutral': 3,
+        'Positive': 4
+    }
+    sentiment = list(sentiment_mapping.keys())[list(sentiment_mapping.values()).index(predicted_class)]
+    predictions.append(sentiment)
+test_df['predictions'] = predictions
+test_df_path = 'test_df_predictions.csv'
+test_df.to_csv(test_df_path, index=False)
+
